@@ -1,21 +1,26 @@
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { InicioComponent } from './components/inicio/inicio.component';
-import { LoginComponent } from './components/login/login.component';
+import { Routes, RouterModule } from '@angular/router';
+
+import { HomeComponent } from './home';
+import { AuthGuard } from './_helpers';
+import { InicioComponent } from './_components/inicio/inicio.component';
+
+const accountModule = () => import('./account/account.module').then(x => x.AccountModule);
+const usersModule = () => import('./users/users.module').then(x => x.UsersModule);
 
 const routes: Routes = [
-  {
-    path:'',
-    component: InicioComponent
-  },
-  {
-    path: 'login',
-    component: LoginComponent
-  }
+
+  { path: 'index', component: InicioComponent},
+    { path: 'login', component: HomeComponent, canActivate: [AuthGuard] },
+    { path: 'users', loadChildren: usersModule, canActivate: [AuthGuard] },
+    { path: 'account', loadChildren: accountModule },
+
+    // otherwise redirect to home
+    { path: '**', redirectTo: 'index' }
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule]
 })
 export class AppRoutingModule { }
